@@ -1,7 +1,7 @@
 {
   "yandex": {
-    "client_id": "", # https://oauth.yandex.ru/client/new
-    "client_secret": "", # take it in https://oauth.yandex.ru/client/<client_id>/info
+    "client_id": "<https://oauth.yandex.ru/client/new>",
+    "client_secret": "<take it at https://oauth.yandex.ru/client/<client_id>/info>",
     "device_id": "",
     "oauth_token": "",
     "delete_dest_older_than": 50,

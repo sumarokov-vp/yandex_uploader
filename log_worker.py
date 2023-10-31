@@ -3,6 +3,15 @@ import logging
 import os
 import sys
 
+try:
+    # Third Party Stuff
+    import servicemanager
+
+    win32 = True
+except ImportError:
+    win32 = False
+
+
 FOLDER_NAME = "logs"
 LOG_FILENAME = os.path.join(FOLDER_NAME, "service.log")
 
@@ -28,7 +37,22 @@ class LogWorker:
         self.logger.addHandler(handler)
 
     def log(self, text):
-        self.logger.info(text)
+        if win32:
+            servicemanager.LogInfoMsg(text)
+        else:
+            self.logger.info(text)
+
+    def info(self, text):
+        if win32:
+            servicemanager.LogInfoMsg(text)
+        else:
+            self.logger.info(text)
+
+    def error(self, text):
+        if win32:
+            servicemanager.LogErrorMsg(text)
+        else:
+            self.logger.error(text)
 
 
 # l = LogWorker()

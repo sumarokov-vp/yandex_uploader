@@ -15,7 +15,6 @@ from yadisk import YaDisk  # type: ignore
 # My Stuff
 from log_worker import LogWorker
 from settings import Settings
-import servicemanager
 from warninger import ok
 
 # import log_worker
@@ -35,7 +34,7 @@ class YDWorker:
         self.days_l = self.settings["delete_dest_older_than"]
 
     def file_upload(self, source_file_path: str):
-        to_dir = self.yandex_root + f"/Zipped"
+        to_dir = self.yandex_root + "/Zipped"
 
         try:
             self.y.mkdir(self.yandex_root)
@@ -106,19 +105,16 @@ class YDWorker:
                     s = format(size, ".2f")
                     text = f"Not enough space for file: {path} size: {s} \
                     Gb, free space: {freespace} Gb, deleting oldest files"
-                    self.l.log(text)
-                    servicemanager.LogInfoMsg(text)
+                    self.l.error(text)
                     self.clean_by_size(size)
                 if size >= freespace and root_size == 0:
                     text = f"There is no enough space on the Yandex Disk to upload file {path}. \
                     And folder {self.yandex_root} is empty. Uploading of this file is canceled"
-                    self.l.log(text)
-                    servicemanager.LogInfoMsg(text)
+                    self.l.error(text)
                     continue
 
                 text = f"Uploading {source_file_path} to {dest_file_path}"
                 self.l.log(text)
-                servicemanager.LogInfoMsg(text)
                 try:
                     self.y.upload(
                         source_file_path,
@@ -128,23 +124,19 @@ class YDWorker:
                     )
                     text = f"Upload complete, removing {source_file_path}"
                     self.l.log(text)
-                    servicemanager.LogInfoMsg(text)
                     # remove file after upload
                     if self.settings["delete_source_after_upload"]:
                         os.remove(source_file_path)
                         text = f"File {path} removed"
                         self.l.log(text)
-                        servicemanager.LogInfoMsg(text)
                     ok()
                 except yadisk.exceptions.PathExistsError:
                     text = f"File {source_file_path} in directory {dest_file_path} already exists"
-                    self.l.log(text)
-                    servicemanager.LogInfoMsg(text)
+                    self.l.error(text)
                 # except yadisk.exceptions.PathExistsError: self.l.log(f'Insufficient Storage')
                 except Exception as e:
                     text = f"Error: {e.args[0]}"
-                    self.l.log(text)
-                    servicemanager.LogInfoMsg(text)
+                    self.l.error(text)
 
     # Clean by days_live
     def clean(self, dir):
