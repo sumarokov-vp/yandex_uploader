@@ -15,7 +15,7 @@ from yandex_disk import YDWorker
 SETTINGS = os.path.join(os.path.dirname(__file__), "settings.json")
 
 
-def main(logger=None):
+def main(logger: LogWorker):
     # load local folders list from settings.json
     with open(SETTINGS, "r") as f:
         settings = json.load(f)
@@ -30,16 +30,20 @@ def main(logger=None):
         yandex_worker.recursive_upload(full_path)
 
 
-def loop():
-    log = LogWorker(DEBUG)
+def loop(log_level: int = INFO):
+    log = LogWorker(level=log_level)
     while True:
         main(log)
         time.sleep(10)
 
 
 if __name__ == "__main__":
-    # repeat uploading every 5 minutes
+    # set log level from command line
+    if sys.argv[1].lower() == "debug":
+        log_level = DEBUG
+    else:
+        log_level = INFO
     try:
-        loop()
+        loop(log_level)
     except KeyboardInterrupt:
         sys.exit()
