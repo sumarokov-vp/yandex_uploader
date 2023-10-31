@@ -23,7 +23,7 @@ def main(logger=None):
 
     # # upload files from local folders to Yandex.Disk
     logger.debug("Creating Yandex.Disk worker")
-    yandex_worker = YDWorker(logger=logger)
+    yandex_worker = YDWorker(log=logger)
     logger.debug("Yandex.Disk worker created")
     for folder in folders:
         full_path = os.path.join(os.path.dirname(__file__), folder)
