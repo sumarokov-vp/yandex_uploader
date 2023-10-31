@@ -1,0 +1,5 @@
+settings.json
+.mypy_cache/
+backup_scripts/
+logs/
+.venv/
