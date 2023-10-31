@@ -25,6 +25,7 @@ def main(logger: LogWorker):
     logger.debug("Creating Yandex.Disk worker")
     yandex_worker = YDWorker(log=logger)
     logger.debug("Yandex.Disk worker created")
+    logger.info(f"Uploading files from {folders}")
     for folder in folders:
         full_path = os.path.join(os.path.dirname(__file__), folder)
         yandex_worker.recursive_upload(full_path)
