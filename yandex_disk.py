@@ -127,12 +127,17 @@ class YDWorker:
                     # remove file after upload
                     if self.settings["delete_source_after_upload"]:
                         os.remove(source_file_path)
-                        text = f"File {path} removed"
+                        text = f"File {source_file_path} removed"
                         self.l.log(text)
                     ok()
                 except yadisk.exceptions.PathExistsError:
                     text = f"File {source_file_path} in directory {dest_file_path} already exists"
                     self.l.error(text)
+                    if self.settings["delete_source_after_upload"]:
+                        os.remove(source_file_path)
+                        text = f"File {source_file_path} removed"
+                        self.l.log(text)
+
                 # except yadisk.exceptions.PathExistsError: self.l.log(f'Insufficient Storage')
                 except Exception as e:
                     text = f"Error: {e.args[0]}"
