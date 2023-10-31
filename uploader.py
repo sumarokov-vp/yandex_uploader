@@ -39,10 +39,11 @@ def loop(log_level: int = INFO):
 
 if __name__ == "__main__":
     # set log level from command line
-    if sys.argv[1].lower() == "debug":
-        log_level = DEBUG
-    else:
+    if len(sys.argv) < 2:
         log_level = INFO
+    else:
+        if sys.argv[1].lower() == "debug":
+            log_level = DEBUG
     try:
         loop(log_level)
     except KeyboardInterrupt:
