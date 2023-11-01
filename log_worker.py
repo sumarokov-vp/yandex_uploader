@@ -56,7 +56,7 @@ class LogWorker:
 
     def debug(self, text):
         if win32:
-            servicemanager.LogInfoMsg(text)
+            pass
         else:
             self.logger.debug(text)
 

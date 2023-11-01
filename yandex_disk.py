@@ -5,10 +5,7 @@ import os
 import posixpath
 import uuid
 import webbrowser
-from pathlib import (
-    PurePosixPath,
-    PureWindowsPath,
-)
+from pathlib import PureWindowsPath
 
 # Third Party Stuff
 import pytz
@@ -68,6 +65,20 @@ class YDWorker:
         except Exception as e:
             self.l.log(f"Error: {e.args[0]}")
 
+    def create_folder(self, full_path: str):
+        # create folder if not exists for each level
+        # parts = PureWindowsPath(full_path).parts
+        path = os.path.normpath(full_path)
+        parts = path.split(os.sep)
+        all_parts = ""
+        for part in parts[1:]:
+            all_parts = all_parts + "/" + part
+            try:
+                self.y.mkdir(all_parts)
+                self.l.info(f"Created yandex disk folder {all_parts}")
+            except yadisk.exceptions.PathExistsError:
+                pass
+
     def recursive_upload(self, from_dir):
         if not self.y.exists(self.yandex_root):
             self.y.mkdir(self.yandex_root)
@@ -84,30 +95,11 @@ class YDWorker:
 
             files.sort()
             for file in files:
-                path = os.path.join(root, file)
-
                 p_posix = p.replace(os.path.sep, "/")
                 dest_folder = posixpath.join(self.yandex_root, dirname, p_posix)
 
-                # create folder if not exists for each level
-                parts = PureWindowsPath(dest_folder).parts
-                self.l.debug(f"Parts: {parts}, len: {len(parts)}")
-                all_parts = ""
-                for part in parts[1:]:
-                    all_parts = all_parts + "/" + part
-                    try:
-                        self.l.debug(f"Trying to create folder {all_parts}")
-                        self.y.mkdir(all_parts)
-                        self.l.info(f"Created folder {all_parts}")
-                    except yadisk.exceptions.PathExistsError:
-                        self.l.debug(f"Folder {all_parts} already exists")
-                        pass
+                self.create_folder(dest_folder)
 
-                # try:
-                #     self.y.mkdir(dest_folder)
-                #     self.l.info(f"Created folder {dest_folder}")
-                # except yadisk.exceptions.PathExistsError:
-                #     pass
                 dest_file_path = posixpath.join(dest_folder, file)
                 p_sys = p.replace("/", os.path.sep)
                 source_file_path = os.path.join(from_dir, p_sys, file)
@@ -117,7 +109,7 @@ class YDWorker:
                     continue
 
                 # check free space
-                size = os.stat(path).st_size / 1024 / 1024 / 1024
+                size = os.stat(source_file_path).st_size / 1024 / 1024 / 1024
                 freespace = self.free_space()
                 root_size = self.folder_size(self.yandex_root)
 
@@ -127,12 +119,12 @@ class YDWorker:
                     and self.settings["delete_oldest_on_no_space"]
                 ):
                     s = format(size, ".2f")
-                    text = f"Not enough space for file: {path} size: {s} \
+                    text = f"Not enough space for file: {source_file_path} size: {s} \
                     Gb, free space: {freespace} Gb, deleting oldest files"
                     self.l.error(text)
                     self.clean_by_size(size)
                 if size >= freespace and root_size == 0:
-                    text = f"There is no enough space on the Yandex Disk to upload file {path}. \
+                    text = f"There is no enough space on the Yandex Disk to upload file {source_file_path}. \
                     And folder {self.yandex_root} is empty. Uploading of this file is canceled"
                     self.l.error(text)
                     continue
@@ -160,7 +152,7 @@ class YDWorker:
                     if self.settings["delete_source_after_upload"]:
                         self.l.log(f"Removing {source_file_path}")
                         os.remove(source_file_path)
-                        text = f"File {path} removed"
+                        text = f"File {source_file_path} removed"
                         self.l.log(text)
                 # except yadisk.exceptions.PathExistsError: self.l.log(f'Insufficient Storage')
                 except Exception as e:
