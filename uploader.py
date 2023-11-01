@@ -16,7 +16,6 @@ SETTINGS = os.path.join(os.path.dirname(__file__), "settings.json")
 
 
 def main(logger: LogWorker):
-    print("Starting upload")
     # load local folders list from settings.json
     with open(SETTINGS, "r") as f:
         settings = json.load(f)

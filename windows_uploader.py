@@ -38,9 +38,10 @@ class YandexUploader(SMWinservice):
         self.isrunning = False
 
     def main(self):
+        log = LogWorker(level=log_level)
         while self.isrunning:
             random.seed()
-            upload()
+            upload(log)
             time.sleep(5)
 
 
