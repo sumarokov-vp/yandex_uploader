@@ -5,7 +5,6 @@ import os
 import posixpath
 import uuid
 import webbrowser
-from pathlib import PureWindowsPath
 
 # Third Party Stuff
 import pytz
@@ -87,22 +86,18 @@ class YDWorker:
         # to_dir = self.yandex_root + f"/{dirname}"
 
         walk = os.walk(from_dir)
-        self.l.debug(f"Walking {from_dir=}")
         for root, dirs, files in walk:
-            self.l.debug(f"Walk found {root=} {dirs=} {files=}")
-            p = root.split(from_dir)[1].strip(os.path.sep)
-            # dest_folder = posixpath.join(to_dir, p)
-
             files.sort()
             for file in files:
+                p = root.split(from_dir)[1].strip(os.path.sep)
                 p_posix = p.replace(os.path.sep, "/")
-                dest_folder = posixpath.join(self.yandex_root, dirname, p_posix)
-
-                self.create_folder(dest_folder)
-
-                dest_file_path = posixpath.join(dest_folder, file)
                 p_sys = p.replace("/", os.path.sep)
+
                 source_file_path = os.path.join(from_dir, p_sys, file)
+
+                dest_folder = posixpath.join(self.yandex_root, dirname, p_posix)
+                self.create_folder(dest_folder)
+                dest_file_path = posixpath.join(dest_folder, file)
 
                 # check file is not locked
                 if not os.access(source_file_path, os.R_OK):
@@ -129,8 +124,7 @@ class YDWorker:
                     self.l.error(text)
                     continue
 
-                text = f"Uploading {source_file_path} to {dest_file_path}"
-                self.l.log(text)
+                self.l.log(f"Uploading {source_file_path} to {dest_file_path}")
                 try:
                     self.y.upload(
                         source_file_path,
@@ -138,13 +132,10 @@ class YDWorker:
                         overwrite=False,
                         timeout=self.settings["upload_timeout"],
                     )
-                    text = f"Upload complete, removing {source_file_path}"
-                    self.l.log(text)
                     # remove file after upload
                     if self.settings["delete_source_after_upload"]:
+                        self.l.log(f"Upload complete, removing {source_file_path}")
                         os.remove(source_file_path)
-                        text = f"File {source_file_path} removed"
-                        self.l.log(text)
                     ok()
                 except yadisk.exceptions.PathExistsError:
                     text = f"File {source_file_path} in directory {dest_file_path} already exists"
@@ -152,8 +143,7 @@ class YDWorker:
                     if self.settings["delete_source_after_upload"]:
                         self.l.log(f"Removing {source_file_path}")
                         os.remove(source_file_path)
-                        text = f"File {source_file_path} removed"
-                        self.l.log(text)
+                        self.l.log(f"File {source_file_path} removed")
                 # except yadisk.exceptions.PathExistsError: self.l.log(f'Insufficient Storage')
                 except Exception as e:
                     text = f"Error: {e.args[0]}"
