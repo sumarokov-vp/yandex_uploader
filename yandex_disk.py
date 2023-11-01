@@ -93,8 +93,8 @@ class YDWorker:
                 parts = PureWindowsPath(dest_folder).parts
                 self.l.debug(f"Parts: {parts}, len: {len(parts)}")
                 all_parts = ""
-                for part in parts:
-                    all_parts = all_parts + "\\" + part
+                for part in parts[1:]:
+                    all_parts = all_parts + "/" + part
                     try:
                         self.l.debug(f"Trying to create folder {all_parts}")
                         self.y.mkdir(all_parts)
