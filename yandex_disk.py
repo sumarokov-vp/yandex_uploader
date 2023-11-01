@@ -128,7 +128,7 @@ class YDWorker:
                     # remove file after upload
                     if self.settings["delete_source_after_upload"]:
                         os.remove(source_file_path)
-                        text = f"File {path} removed"
+                        text = f"File {source_file_path} removed"
                         self.l.log(text)
                     ok()
                 except yadisk.exceptions.PathExistsError:

@@ -3,6 +3,10 @@ import json
 import os
 import sys
 import time
+from logging import (
+    DEBUG,
+    INFO,
+)
 
 # My Stuff
 from log_worker import LogWorker
@@ -11,29 +15,37 @@ from yandex_disk import YDWorker
 SETTINGS = os.path.join(os.path.dirname(__file__), "settings.json")
 
 
-def main():
-    log = LogWorker()
+def main(logger: LogWorker):
     # load local folders list from settings.json
     with open(SETTINGS, "r") as f:
         settings = json.load(f)
     folders = settings["yandex"]["local_folders"]
 
     # # upload files from local folders to Yandex.Disk
-    yandex_worker = YDWorker(log)
+    logger.debug("Creating Yandex.Disk worker")
+    yandex_worker = YDWorker(log=logger)
+    logger.debug("Yandex.Disk worker created")
+    logger.info(f"Uploading files from {folders}")
     for folder in folders:
         full_path = os.path.join(os.path.dirname(__file__), folder)
         yandex_worker.recursive_upload(full_path)
 
 
-def loop():
+def loop(log_level: int = INFO):
+    log = LogWorker(level=log_level)
     while True:
-        main()
-        time.sleep(3)
+        main(log)
+        time.sleep(10)
 
 
 if __name__ == "__main__":
-    # repeat uploading every 5 minutes
+    # set log level from command line
+    if len(sys.argv) < 2:
+        log_level = INFO
+    else:
+        if sys.argv[1].lower() == "debug":
+            log_level = DEBUG
     try:
-        loop()
+        loop(log_level)
     except KeyboardInterrupt:
         sys.exit()
