@@ -29,6 +29,7 @@ from logging import (
 from base_windows import SMWinservice
 from log_worker import LogWorker
 from uploader import main as upload
+from yandex_disk import YDWorker
 
 
 class YandexUploader(SMWinservice):
@@ -44,9 +45,10 @@ class YandexUploader(SMWinservice):
 
     def main(self):
         log = LogWorker(level=DEBUG)
+        yandex_worker = YDWorker(log=log)
         while self.isrunning:
             random.seed()
-            upload(log)
+            upload(log, yandex_worker)
             time.sleep(5)
 
 

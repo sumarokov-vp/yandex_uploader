@@ -15,17 +15,14 @@ from yandex_disk import YDWorker
 SETTINGS = os.path.join(os.path.dirname(__file__), "settings.json")
 
 
-def main(logger: LogWorker):
+def main(logger: LogWorker, yandex_worker: YDWorker):
     # load local folders list from settings.json
     with open(SETTINGS, "r") as f:
         settings = json.load(f)
     folders = settings["yandex"]["local_folders"]
 
     # # upload files from local folders to Yandex.Disk
-    logger.debug("Creating Yandex.Disk worker")
-    yandex_worker = YDWorker(log=logger)
-    logger.debug("Yandex.Disk worker created")
-    logger.info(f"Uploading files from {folders}")
+    logger.debug(f"Uploading files from {folders}")
     for folder in folders:
         # full_path = os.path.join(os.path.dirname(__file__), folder)
         yandex_worker.recursive_upload(folder)
@@ -33,8 +30,9 @@ def main(logger: LogWorker):
 
 def loop(log_level: int = INFO):
     log = LogWorker(level=log_level)
+    yandex_worker = YDWorker(log=log)
     while True:
-        main(log)
+        main(log, yandex_worker)
         time.sleep(10)
 
 
