@@ -96,7 +96,9 @@ class YDWorker:
                 for part in parts:
                     all_parts = all_parts + "\\" + part
                     try:
+                        self.l.debug(f"Trying to create folder {all_parts}")
                         self.y.mkdir(all_parts)
+                        self.l.info(f"Created folder {all_parts}")
                     except yadisk.exceptions.PathExistsError:
                         self.l.debug(f"Folder {all_parts} already exists")
                         pass
