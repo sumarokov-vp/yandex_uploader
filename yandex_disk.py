@@ -73,7 +73,6 @@ class YDWorker:
             self.y.mkdir(self.yandex_root)
 
         dirname = os.path.basename(from_dir)
-        dest_folder = posixpath.join(self.yandex_root, dirname)
         # to_dir = self.yandex_root + f"/{dirname}"
 
         walk = os.walk(from_dir)
@@ -83,17 +82,18 @@ class YDWorker:
             p = root.split(from_dir)[1].strip(os.path.sep)
             # dest_folder = posixpath.join(to_dir, p)
 
-            try:
-                self.y.mkdir(dest_folder)
-            except yadisk.exceptions.PathExistsError:
-                pass
-
             files.sort()
             for file in files:
                 path = os.path.join(root, file)
 
                 p_posix = p.replace(os.path.sep, "/")
-                dest_file_path = posixpath.join(dest_folder, p_posix, file)
+                dest_folder = posixpath.join(self.yandex_root, dirname, p_posix)
+                try:
+                    self.y.mkdir(dest_folder)
+                    self.l.info(f"Created folder {dest_folder}")
+                except yadisk.exceptions.PathExistsError:
+                    pass
+                dest_file_path = posixpath.join(dest_folder, file)
                 p_sys = p.replace("/", os.path.sep)
                 source_file_path = os.path.join(from_dir, p_sys, file)
 
