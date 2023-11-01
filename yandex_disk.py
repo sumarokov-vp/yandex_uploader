@@ -92,13 +92,14 @@ class YDWorker:
                 # create folder if not exists for each level
                 parts = PureWindowsPath(dest_folder).parts
                 self.l.debug(f"Parts: {parts}, len: {len(parts)}")
-                for i in range(1, len(parts) + 1):
-                    folder = PurePosixPath(*parts[:i]).as_posix()
-                    self.l.debug(f"creating Folder: {folder}")
-                    if not self.y.exists(folder):
-                        self.y.mkdir(folder)
-                    else:
-                        self.l.debug(f"Folder {folder} already exists")
+                all_parts = ""
+                for part in parts:
+                    all_parts = all_parts + "\\" + part
+                    try:
+                        self.y.mkdir(all_parts)
+                    except yadisk.exceptions.PathExistsError:
+                        self.l.debug(f"Folder {all_parts} already exists")
+                        pass
 
                 # try:
                 #     self.y.mkdir(dest_folder)
