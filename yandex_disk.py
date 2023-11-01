@@ -89,8 +89,9 @@ class YDWorker:
                 path = os.path.join(root, file)
 
                 dest_file_path = posixpath.join(dest_folder, file)
+                dest_file_path_true = posixpath.join(dest_folder, p, file)
                 self.l.debug(
-                    f"!!! creating dest_file_path from {dest_folder=} and {file=} = {dest_file_path=} \n{p=} {root=} {path=}"
+                    f"!!! creating dest_file_path from {dest_folder=} and {file=} = {dest_file_path=} \n{p=} {root=} {path=} {dest_file_path_true=}"
                 )
                 p_sys = p.replace("/", os.path.sep)
                 source_file_path = os.path.join(from_dir, p_sys, file)
