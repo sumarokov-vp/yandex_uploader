@@ -69,12 +69,13 @@ class YDWorker:
             self.y.mkdir(self.yandex_root)
 
         dirname = os.path.basename(from_dir)
-        to_dir = self.yandex_root + f"/{dirname}"
+        dest_folder = posixpath.join(self.yandex_root, dirname)
+        # to_dir = self.yandex_root + f"/{dirname}"
 
         walk = os.walk(from_dir)
         for root, dirs, files in walk:
             p = root.split(from_dir)[1].strip(os.path.sep)
-            dest_folder = posixpath.join(to_dir, p)
+            # dest_folder = posixpath.join(to_dir, p)
 
             try:
                 self.y.mkdir(dest_folder)
@@ -133,6 +134,11 @@ class YDWorker:
                 except yadisk.exceptions.PathExistsError:
                     text = f"File {source_file_path} in directory {dest_file_path} already exists"
                     self.l.error(text)
+                    if self.settings["delete_source_after_upload"]:
+                        self.l.log(f"Removing {source_file_path}")
+                        os.remove(source_file_path)
+                        text = f"File {path} removed"
+                        self.l.log(text)
                 # except yadisk.exceptions.PathExistsError: self.l.log(f'Insufficient Storage')
                 except Exception as e:
                     text = f"Error: {e.args[0]}"
