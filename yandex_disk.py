@@ -73,7 +73,7 @@ class YDWorker:
         # to_dir = self.yandex_root + f"/{dirname}"
 
         walk = os.walk(from_dir)
-        self.l.debug(f"Uploading files from {from_dir} to {dest_folder}")
+        self.l.debug(f"Walking {from_dir=}")
         for root, dirs, files in walk:
             self.l.debug(f"Walk found {root=} {dirs=} {files=}")
             p = root.split(from_dir)[1].strip(os.path.sep)
