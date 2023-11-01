@@ -20,9 +20,14 @@ install pywin32 and other from pip
 # Standard Library
 import random
 import time
+from logging import (
+    DEBUG,
+    INFO,
+)
 
 # My Stuff
 from base_windows import SMWinservice
+from log_worker import LogWorker
 from uploader import main as upload
 
 
@@ -38,7 +43,7 @@ class YandexUploader(SMWinservice):
         self.isrunning = False
 
     def main(self):
-        log = LogWorker(level=log_level)
+        log = LogWorker(level=DEBUG)
         while self.isrunning:
             random.seed()
             upload(log)
