@@ -87,9 +87,10 @@ class YDWorker:
             files.sort()
             for file in files:
                 path = os.path.join(root, file)
+
                 dest_file_path = posixpath.join(dest_folder, file)
-                self.l.info(
-                    f"!!! creating dest_file_path from {dest_folder=} and {file=} = {dest_file_path=}"
+                self.l.debug(
+                    f"!!! creating dest_file_path from {dest_folder=} and {file=} = {dest_file_path=} \n{p=} {root=} {path=}"
                 )
                 p_sys = p.replace("/", os.path.sep)
                 source_file_path = os.path.join(from_dir, p_sys, file)
